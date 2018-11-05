@@ -3,23 +3,22 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:button_label_design_research/Utility/FakeData.dart' as FakeData;
-import 'package:button_label_design_research/Utility/MyFBDocuments.dart' as MyFBDocuments;
+import 'package:button_label_design_research/Utility/MyFBDocuments.dart'
+    as MyFBDocuments;
 
 // This is a list of all user events
-List<MyFBDocuments.EventItem> allUserEventsDataList = new List();
+List<MyFBDocuments.TweetItem> allTweetDataList = new List();
 
 /// Contact Detail Page which displays information on a person.
 class TweetListView extends StatefulWidget {
 //  static const String routeName = '/contacts';
 // here is a state object now defined in MessengerDetailPage
-  TweetListView({Key key})
-      : super(key: key);
+  TweetListView({Key key}) : super(key: key);
 
 //  final DocumentSnapshot personInformationDocument;
 
   @override
-  TweetListViewPageState createState() =>
-      new TweetListViewPageState();
+  TweetListViewPageState createState() => new TweetListViewPageState();
 }
 
 /// Contact Detail page state.
@@ -33,7 +32,7 @@ class TweetListViewPageState extends State<TweetListView> {
   void initState() {
     super.initState();
     setState(() {
-      allUserEventsDataList = new List();
+      allTweetDataList = FakeData.allTweets;
 
       // initialize text controller
       _textController.clear();
@@ -65,11 +64,14 @@ class TweetListViewPageState extends State<TweetListView> {
 //        new Divider(height: 1.0), // userListItem Dividers
 
         new Flexible(
-          child: (_textController.text != "")
-              ? new ListView(
-                  children: _buildFriendsList(allUserEventsDataList),
-                )
-              : new EventsList(),
+          child: new ListView(
+            children: _buildTweetsList(allTweetDataList),
+          ),
+//          child: (_textController.text != "")
+//              ? new ListView(
+//                  children: _buildTweetsList(allTweetDataList),
+//                )
+//              : new TweetList(),
 //            new ListView(children: _buildChatsList(),)
         ),
       ]),
@@ -136,102 +138,185 @@ class TweetListViewPageState extends State<TweetListView> {
   }
 
 // update results and UI to to show what the user searched for
-  void _getEventsMatching(String searchInput) {
-
-  }
-
-
-
+  void _getEventsMatching(String searchInput) {}
 
   /// Create list of user friends.
-  List<_EventListItem> _buildFriendsList(
-      List<MyFBDocuments.EventItem> eventItemInput) {
-    var items = new List<_EventListItem>();
+  List<_TweetListItem> _buildTweetsList(
+      List<MyFBDocuments.TweetItem> eventItemInput) {
+    var items = new List<_TweetListItem>();
     for (var eventData in eventItemInput) {
-      items.add(new _EventListItem(eventData));
+      items.add(new _TweetListItem(eventData));
     }
     return items;
   }
 }
 
 /// List of user events
-class EventsList extends StatelessWidget {
-
-
+class TweetList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new ListView(
       children: <Widget>[
         // single event item
-          new _EventListItem(FakeData.fakeEventData2)
+        new _TweetListItem(FakeData.fakeEventData2)
       ],
     );
   }
 }
 
 /// This is one contact list item.
-class _EventListItem extends StatelessWidget {
-  _EventListItem(this.eventDocument);
+class _TweetListItem extends StatelessWidget {
+  _TweetListItem(this.eventDocument);
 
-  final MyFBDocuments.EventItem eventDocument;
+  final MyFBDocuments.TweetItem eventDocument;
 
   @override
   Widget build(BuildContext context) {
-    return new FlatButton(
-        onPressed: () {
-          // todo open event TabView view
+    return new Container(
+        padding: const EdgeInsets.all(2.0),
+        child: new ExpansionTile(
+            backgroundColor: Theme.of(context).accentColor.withOpacity(0.025),
+            leading: new Container(
+//                margin: const EdgeInsets.only(right: 16.0),
+              child: (eventDocument.photoUrl != null)
+                  ? new CircleAvatar(
+                      backgroundImage: new NetworkImage(eventDocument
+                          .photoUrl) // display userphoto from Firebase Database
+//                    new NetworkImage(googleSignIn.currentUser.photoUrl) // get google profile photo
+                      )
+                  : new CircleAvatar(
+                      child:
+                          new Text(eventDocument.displayName[0])), // old avatar
+            ),
+            title: new Container(
+              child: new Row(
+                children: <Widget>[
+                  new Expanded(
+                    child: new GestureDetector(
+                        onTap: () {
+                          // Open MessengerDetailPage
 
-          // open another
+                          // Setup information to pass to MessengerDetailPage
+                          // this is the chat id of the specific friend
+//                          MyVariables.chatInfoItemForDetail = new MyFBDocuments
+//                                  .ChatInfoItem.fromUserFriendItem(
+//                              UserFriendsDocList[ownerPositionInFriendsList]);
+//                          // this is the group name or the recipient name
+//                          MyVariables.chatNameForDetail =
+//                              UserFriendsDocList[ownerPositionInFriendsList]
+//                                  .displayName;
+                          // notify MessengerDetailPage.dart if I am opening a group chat or a direct chat
+//                          MyVariables.openingGroupMessenger = false;
 
-//          Navigator.push(
-//            context,
-//            MaterialPageRoute(builder: (context) =>
-//                EventTabView.EventTabView(OpenEventDocument: eventDocument)),
-//          );
-        },
-        child: new Container(
-            // could just return container
-            //modified
-            margin: const EdgeInsets.symmetric(vertical: 10.0),
-            child: new Row(
-              children: <Widget>[
-                new Expanded(
-                  child: new Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      new Text(eventDocument.title),
-                      // Display userListItem from Firebase Database
-                      new Text(eventDocument.activity,
-                          style: Theme.of(context).textTheme.subhead),
-                    ],
+                          // Navigate to MessengerDetailPage
+//                          Navigator.of(context)
+//                              .pushNamed("/MessengerDetailPage");
+                        },
+                        child: new Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            new Text(eventDocument.displayName),
+                            new Text(eventDocument.text),
+
+                            new Container(
+                              margin: const EdgeInsets.only(top: 5.0),
+                              child: eventDocument.imageUrl != null
+                                  ? // if image Url exist then display image
+                              new Image.network(
+                                eventDocument.imageUrl,
+                                width: 250.0,
+                              )
+                                  : // This acts like an or statement
+                              // Display nothing
+                              new Container(
+                                child: null,
+                              )
+                            ),
+
+//                            new NetworkImage("https://pbs.twimg.com/media/DrRePJjXQAAAoyu.jpg")
+//                            _buildActions(),
+                          ],
+                        )),
                   ),
-                ),
-              ],
-            )));
-  }
+//                  new Container(
+//                      child: new IconButton(
+//                          icon: (_inviteSent)
+//                              ? new Icon(Icons.done)
+//                              : new Icon(Icons.send),
+//                          onPressed: () {
+//
+//                            setState(() {
+//                              _inviteSent = true;
+//                            });
+//
+//                            // Send invite message to friend
+//                            _sendFriendInvite(
+//                                context,
+//                                ownerPositionInFriendsList,
+//                                widget.availableFriendEvent);
+//                          })),
+                ],
+              ),
+            ),
+            children: <Widget>[
+              new Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  new Container(
+                    // show event note only if there is a note
+                    child: (eventDocument.text != "")
+                        ? new Container(
+//                    padding: const EdgeInsets.fromLTRB(0.0, ),
+                            child: new Column(
+                            children: <Widget>[
+//                              new Text("Note:"),
+//                              new Text(eventDocument.note),
+                              new Container(
+                                child: _buildActions(),
+                              )
+                            ],
+                          ))
+                        : null,
+                  )
+                ],
+              ),
+            ]));
 
-  /// Send message to designated friend.
-//  _sendMessageToFriend(
-//      BuildContext context, String friendUid, String friendName) {
-//    // Update information to send to MessengerDetailPage.dart
-//    MyVariables.chatIDForDetail = eventDocument[MyConstants.chatID2];
-//    MyVariables.chatNameForDetail =
-//        friendName; //.substring(0, friendName.indexOf(" "));
+//    return new FlatButton(
+//        onPressed: () {
+//          // todo open event TabView view
 //
-//    MyVariables.chatInfoItemForDetail = new eventDocument;
+//          // open another
 //
-//    // notify MessengerDetailPage.dart that I am not opening a group chat
-//    MyVariables.openingGroupMessenger = false;
+////          Navigator.push(
+////            context,
+////            MaterialPageRoute(builder: (context) =>
+////                EventTabView.EventTabView(OpenEventDocument: eventDocument)),
+////          );
+//        },
+//        child: new Container(
+//            // could just return container
+//            //modified
+//            margin: const EdgeInsets.symmetric(vertical: 10.0),
 //
-//    // open new messenger detail page and pass chatID
-//    /// Opens a detailed messenger page to the specified chat page.
-//    Navigator
-//        .of(context)
-//        .pushNamed("/MessengerDetailPage/${MyVariables.chatIDForDetail}");
-//
-//    // Opens DetailedMessenger page
-////    _openDetailedMessengerPage(context, MyVariables.chatID);
-//  }
+//            child: new Row(
+//              children: <Widget>[
+//                new Expanded(
+//                  child: new Column(
+//                    crossAxisAlignment: CrossAxisAlignment.start,
+//                    children: <Widget>[
+//                      new Text(eventDocument.displayName),
+//                      // Display userListItem from Firebase Database
+//                      new Text(eventDocument.note,
+//                          style: Theme.of(context).textTheme.subhead),
+//                    ],
+//                  ),
+//                ),
+//              ],
+//            )
+//        )
+//    );
+  }
 
   /// Opens a detailed messenger page to the specified chat page.
 //  _openDetailedMessengerPage(BuildContext context, String chatID) {
@@ -276,4 +361,79 @@ class _EventListItem extends StatelessWidget {
 //
 //    return item;
 //  }
+
+// This is a text input for search textfield
+  Widget _buildActions() {
+    return new Container(
+        height: 40.0,
+        child: new ListView(
+          scrollDirection: Axis.horizontal,
+          children: <Widget>[
+            new Row(
+              children: <Widget>[
+                new FlatButton(
+                    onPressed: (){},
+                    child: new Container(
+                      margin: new EdgeInsets.symmetric(horizontal: 4.0),
+                      child: new Text("Like"),
+                    )),
+                new FlatButton(
+                    onPressed: (){},
+                    child: new Container(
+                      child: new Text("Respect"),
+                    )),
+                new FlatButton(
+                    onPressed: (){},
+                    child: new Container(
+                      child: new Text("Care"),
+                    )),
+                new FlatButton(
+                    onPressed: (){},
+                    child: new Container(
+                      child: new Text("Fear"),
+                    )),
+                new FlatButton(
+                    onPressed: (){},
+                    child: new Container(
+                      child: new Text("Incivil"),
+                    )),
+              ],
+            )
+          ],
+        ));
+//        child: new ListView.builder(
+//            scrollDirection: Axis.horizontal,
+//            itemBuilder: (BuildContext context, int index) {
+//              return new Row(
+//                children: <Widget>[
+//                  new FlatButton(
+//                      onPressed: null,
+//                      child: new Container(
+//                        margin: new EdgeInsets.symmetric(horizontal: 4.0),
+//                        child: new Text("Like"),
+//                      )),
+//                  new FlatButton(
+//                      onPressed: null,
+//                      child: new Container(
+//                        child: new Text("Respect"),
+//                      )),
+//                  new FlatButton(
+//                      onPressed: null,
+//                      child: new Container(
+//                        child: new Text("Care"),
+//                      )),
+//                  new FlatButton(
+//                      onPressed: null,
+//                      child: new Container(
+//                        child: new Text("Fear"),
+//                      )),
+//                  new FlatButton(
+//                      onPressed: null,
+//                      child: new Container(
+//                        child: new Text("Incivil"),
+//                      )),
+//                ],
+//              );
+//            }));
+  }
 }

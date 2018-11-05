@@ -519,32 +519,26 @@ class ChatMemberItem {
 /////////////////////////////////////////////////////////////////////////////////
 
 /// calendar Document item.
-class EventItem {
+class TweetItem {
   // fields
-  String title;
-  DateTime endTime;
-  String activity;
-  String calendar;
-  String groupID;
-  String note;
+  String displayName;
+  String photoUrl;
+  String imageUrl;
+  String text;
   DateTime timecreated;
   DateTime lastModified;
   String owner;
-  DateTime startTime;
   String documentID;
 
   // constructor if manually adding
-  EventItem(
-      {this.title,
-      this.endTime,
-      this.activity,
-      this.calendar,
-      this.groupID,
-      this.note,
+  TweetItem(
+      {this.displayName,
+        this.photoUrl,
+        this.imageUrl,
+      this.text,
       this.timecreated,
       this.lastModified,
       this.owner,
-      this.startTime,
       this.documentID});
 
   // constructor to map new item from json
@@ -565,16 +559,13 @@ class EventItem {
 
   Map<String, dynamic> toMapString() {
     return {
-      'title': this.title,
-      'endTime': this.endTime,
-      'activity': this.activity,
-      'calendar': this.calendar,
-      'groupID': this.groupID,
-      'note': this.note,
+      'displayName': this.displayName,
+      'photoUrl': this.photoUrl,
+      'imageUrl': this.imageUrl,
+      'text': this.text,
       'timecreated': this.timecreated,
       'lastModified': this.lastModified,
       'owner': this.owner,
-      'startTime': this.startTime,
       'documentID': this.documentID
     };
   }
